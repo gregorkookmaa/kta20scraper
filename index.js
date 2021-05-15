@@ -12,7 +12,11 @@ const { exit } = require('process');
 // });
 async function download(url, filename){
     const writer = fs.createWriteStream(path.resolve(__dirname, filename));
-    const response = await axios.get(url, {responseType: 'stream'});
+    const response = await axios({
+        url,
+        method: 'GET',
+        responseType: 'stream'
+    });
     response.data.pipe(writer);
     return new Promise((resolve, reject) => {
         writer.on('finish', resolve);
@@ -47,28 +51,18 @@ async function getOrCache(url){
 
 
 (async ()=> {
-    for(let i = 220; i<230; i++){
-        let response = await axios.get(`https://extrafabulouscomics.com/comic/${i}/`);
-        const $ = cheerio.load(response.data);
-        let src = 'https:' + $('#comic img').attr('src');
-        console.log(src);
-        let parts = src.split('/');
-        //await download(src, 'images/'+parts[parts.length-1]);
+    const baseURL = 'https://extrafabulouscomics.com';
+    for(let i = 500; i<510; i++){
+        try{
+            let data = await getOrCache(baseURL + `/comic/${i}/`);
+            const $ = cheerio.load(data);
+            let src = $('#comic img').attr('src');
+            let title = $('#comic img').attr('alt')
+            console.log(src, title);
+            let parts = src.split('/');
+            await download(src, 'images/'+parts[parts.length-1]);
+        } catch (err) {
+            console.log(err);
+        }
     }
 })();
-//`https://extrafabulouscomics.com/comic/${i}/`
-
-// axios.get('https://extrafabulouscomics.com/comic/225/').then((response)=> {
-//     const $ = cheerio.load(response.data);
-//     console.log ($('#comic img').attr('src'));
-// });
-
-
-// THIS WORKS!
-// (async ()=> {
-//     for(let i = 220; i<230; i++){
-//         let response = await axios.get(`https://extrafabulouscomics.com/comic/${i}/`);
-//         const $ = cheerio.load(response.data);
-//         console.log($('#comic img').attr('src'));
-//     }
-// })();
