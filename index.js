@@ -8,7 +8,7 @@ const { exit } = require('process');
 //     const $ = cheerio.load(response.data);
 //     console.log('callback', $('#comic img').attr('src'));
 // }).catch((error) => {
-
+    
 // });
 async function download(url, filename){
     const writer = fs.createWriteStream(path.resolve(__dirname, filename));
@@ -45,24 +45,30 @@ async function getOrCache(url){
       }
 }
 
-(async ()=> {
 
-    let prev = 'https://www.prismamarket.ee/products/16929/page/1?main_view=1';
-    for(let i = 0; i<1; i++){
-        try {
-            let data = await getOrCache(prev);
-            console.log(data);
-            // const $ = cheerio.load(data);
-            // let src = baseURL + $('.box-content img').attr('src');
-            // if(!$('.prev').length){
-            //     return;
-            // }
-            // prev = baseURL + $('.prev').attr('href');
-            // console.log(src);
-            // let parts = src.split('/');
-            //await download(src, 'images/'+parts[parts.length-1]);
-        } catch (err) {
-            console.log(err);
-        }
+(async ()=> {
+    for(let i = 220; i<230; i++){
+        let response = await axios.get(`https://extrafabulouscomics.com/comic/${i}/`);
+        const $ = cheerio.load(response.data);
+        let src = 'https:' + $('#comic img').attr('src');
+        console.log(src);
+        let parts = src.split('/');
+        //await download(src, 'images/'+parts[parts.length-1]);
     }
 })();
+//`https://extrafabulouscomics.com/comic/${i}/`
+
+// axios.get('https://extrafabulouscomics.com/comic/225/').then((response)=> {
+//     const $ = cheerio.load(response.data);
+//     console.log ($('#comic img').attr('src'));
+// });
+
+
+// THIS WORKS!
+// (async ()=> {
+//     for(let i = 220; i<230; i++){
+//         let response = await axios.get(`https://extrafabulouscomics.com/comic/${i}/`);
+//         const $ = cheerio.load(response.data);
+//         console.log($('#comic img').attr('src'));
+//     }
+// })();
